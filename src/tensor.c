@@ -21,7 +21,7 @@ Tensor tensor_create(int ndim, int *shape) {
     t.data = (float *)malloc(sizeof(float) * t.size);
 
     if (t.data == NULL) {
-        fprintf(stderr, "Erro: falha ao alocar memória para tensor\n");
+        fprintf(stderr, "Error: failed allocating memmory for tensor \n");
         exit(1);
     }
 
@@ -60,7 +60,7 @@ void tensor_print(Tensor *t) {
 
 float tensor_get_2d(Tensor *t, int i, int j) {
     if (t->ndim != 2) {
-        printf("Erro: tensor_get_2d chamado em tensor ndim=%d\n", t->ndim);
+        printf("Error: tensor_get_2d called with a ndim=%d tensor \n", t->ndim);
         exit(1);
     }
 
@@ -68,7 +68,7 @@ float tensor_get_2d(Tensor *t, int i, int j) {
     int cols = t->shape[1];
 
     if (i < 0 || i >= rows || j < 0 || j >= cols) {
-        printf("Erro: índice fora dos limites (%d, %d)\n", i, j);
+        printf("Error: index out of bounds (%d, %d)\n", i, j);
         exit(1);
     }
 
@@ -78,7 +78,7 @@ float tensor_get_2d(Tensor *t, int i, int j) {
 
 void tensor_set_2d(Tensor *t, int i, int j, float value) {
     if (t->ndim != 2) {
-        printf("Erro: tensor_set_2d chamado em tensor ndim=%d\n", t->ndim);
+        printf("Error: tensor_set_2d called with a ndim=%d tensor \n", t->ndim);
         exit(1);
     }
 
@@ -86,7 +86,7 @@ void tensor_set_2d(Tensor *t, int i, int j, float value) {
     int cols = t->shape[1];
 
     if (i < 0 || i >= rows || j < 0 || j >= cols) {
-        printf("Erro: índice fora dos limites (%d, %d)\n", i, j);
+        printf("Error: index out of bounds (%d, %d)\n", i, j);
         exit(1);
     }
 
@@ -96,7 +96,7 @@ void tensor_set_2d(Tensor *t, int i, int j, float value) {
 
 Tensor tensor_matmul_2d(Tensor *A, Tensor *B) {
     if (A->ndim != 2 || B->ndim != 2) {
-        printf("Erro: matmul requer tensores 2D\n");
+        printf("Error: matmul needs 2D tensors\n");
         exit(1);
     }
 
@@ -106,7 +106,7 @@ Tensor tensor_matmul_2d(Tensor *A, Tensor *B) {
     int n = B->shape[1];
 
     if (kA != kB) {
-        printf("Erro: dimensões incompatíveis (%d x %d) * (%d x %d)\n",
+        printf("Error: incompatible dimensions (%d x %d) * (%d x %d)\n",
                A->shape[0], A->shape[1], B->shape[0], B->shape[1]);
         exit(1);
     }
@@ -132,7 +132,7 @@ Tensor tensor_matmul_2d(Tensor *A, Tensor *B) {
 
 void tensor_softmax_rows(Tensor *t) {
     if (t->ndim != 2) {
-        printf("Erro: softmax requer tensor 2D\n");
+        printf("Error: softmax needs a 2D tensor \n");
         exit(1);
     }
 
