@@ -60,6 +60,8 @@ Quaisquer necessidade, alteraremos as funções futuramente.
 
 Agora, vamos para outra parte essencial do nosso LLM. Temos a estrutura de dados definida (os tensores) e agora teremos a construção do vocabulário do nosso LLM. 
 
+ATENÇÃO: USAREMOS O TOKENIZER DO ANDREJ! https://github.com/karpathy/llama2.c/blob/master/tokenizer.bin
+
 Dentro de tokenizer.h, temos o struct:
 
 typedef struct {
@@ -219,6 +221,10 @@ vocab_size is the size of the vocabulary. Since C requires explicit memory manag
 byte_pieces is simply a raw byte fallback. It exists so that if an unknown or unusual character (such as emojis or unsupported symbols) enters the model, it can be replaced by a raw byte instead of breaking the tokenizer.
 
 Functions overview
+
+WE WILL USE ANDREJ'S TOKENIZER FOR THIS PROJECT
+
+https://github.com/karpathy/llama2.c/blob/master/tokenizer.bin
 
 tokenizer_init
 This function reads the vocabulary file and initializes the tokenizer in RAM.
