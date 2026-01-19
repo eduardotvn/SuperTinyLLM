@@ -24,6 +24,10 @@ int main() {
 
     tokenizer_init(&tokenizer, BIN_PATH, 32000);
 
+    int result = str_lookup("Hello", &tokenizer);
+
+    printf("Result: %d", result);
+
     tokenizer_free(&tokenizer);
 
     return 0;
