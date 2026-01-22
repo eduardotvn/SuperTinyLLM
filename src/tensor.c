@@ -166,3 +166,31 @@ void tensor_add_inplace(Tensor *a, Tensor *b) {
         a->data[i] += b->data[i];
     }
 }
+
+void tensor_scale(Tensor *t, float factor) {
+    for (int i = 0; i < t->size; i++) {
+        t->data[i] *= factor;
+    }
+}
+
+Tensor tensor_transpose(Tensor *t) {
+    if (t->ndim != 2) {
+        fprintf(stderr, "Error: tensor_transpose needs a 2D tensor \n");
+        exit(1);
+    }
+
+    int rows = t->shape[0];
+    int cols = t->shape[1];
+
+    int new_shape[2] = {cols, rows};
+    Tensor out = tensor_create(2, new_shape);
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            float val = tensor_get_2d(t, i, j);
+            tensor_set_2d(&out, j, i, val); 
+        }
+    }
+
+    return out;
+}

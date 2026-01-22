@@ -19,5 +19,7 @@ void tensor_set_2d(Tensor *t, int i, int j, float value);
 Tensor tensor_matmul_2d(Tensor *A, Tensor *B);
 void tensor_softmax_rows(Tensor *t);
 void tensor_add_inplace(Tensor *a, Tensor *b);
+Tensor tensor_transpose(Tensor *t);
+void tensor_scale(Tensor *t, float factor);
 
 #endif

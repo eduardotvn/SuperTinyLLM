@@ -98,6 +98,27 @@ tokenizer_decode é o processo reverso e mais simples. Ele já tem o número, ag
 
 Com isso, temos o nosso sistema pronto: o leitor do dicionário, o tradutor que transforma chars em números e depois números em chars e o "coletor de lixo" que limpa a memória em seguida. Nos próximos passos, vamos começar a implementar cálculos necessários ao LLM, a rede neural e como integrar isso tudo.
 
+# 22/01/2025
+
+Adicionados algumas operações a mais:
+
+Em tensor.c, vamos adicionar um multiplicador de tensores pois colocamos o somador mas não o multiplicador. Esta função será o tensor_scale, que é útil para quando multiplicarmos nossos tensores por pesos do modelo.
+
+Também adicionaremos o tensor_transpose, pois no momento em que calculamos a atenção do modelo, multiplicamos duas matrizes que não tem tamanhos ideais, então precisamos ajustar a segunda, ex: axb * cxb, precisa se tornar axb * bxc
+
+Criamos o nn_ops.c: Nossas neural networks operations!
+
+Essas funções serão úteis para a montagem de nossas camadas, pois precisamos que as matrizes "multipliquem-se" entre si, para gerar novos valores e novas matrizes que serão melhor explicados na próxima etapa.
+
+Mas em resumo, nós temos que cada entrada é uma matriz, que passará por uma fase de transformações sequenciais, sendo multiplicadas por valores e outras matrizes, até que no final, será uma matriz totalmente diferente. O negócio é que essa matriz totalmente diferente é o resultado do nosso LLM, e dela sairá nossa frase.
+
+Em nn_rmsnorm, que é um algoritmo já "batido" em LLMs modernos, temos o Root Mean Square Normalization, ficaria em português algo como normalização pela média dos quadrados (não há consenso na tradução para o termo). Usamos isso porque as matrizes podem gerar números muito grandes ou muito pequenos, e isso vai arruinar os cálculos futuros pois queremos que haja um cálculo "padronizado" entre camadas, isto é, sem números grandes demais ou pequenos demais, apenas com números representativos. Essa técnica é ideal para manter os números sob um padrão.
+
+Em nn_silu temos uma função de ativação sigmoidal. Essa função ficará entre nossas camadas para decidir como os neurônios vão ativar. Isto é, imagine que cada neurônio é responsável por uma "informação" do nosso LLM, por exemplo, sabemos que "Olá! Tudo... " em seguida vem "bem?", cada neurônio tem uma informação do que fazer a seguir, mas os neurônios certos (que aprenderam saudação) vão ativar com mais força, então terão um voto maior, e por isso, uma influencia maior que os demais.
+
+Com isso, beiramos a construção da rede neural, que adicionaremos layers.c e layers.h
+
+
 # ENGLISH
 
 Hello! This is a tiny LLM project (well below 1 billion parameters, we’ll see) created purely for learning purposes.
@@ -254,3 +275,23 @@ Final overview:
 With this, we now have a complete system:
 
 A dictionary loader, a translator that converts characters into numeric tokens, reverse translator that converts tokens back into text, a memory cleanup routine. In the next steps, we will begin implementing the core LLM computations, including the neural network itself and how all these components are integrated together.
+
+# Day 22/01/2026
+
+Added a few more operations:
+
+In tensor.c, we will add a tensor multiplier, since we added the adder but not the multiplier. This function will be tensor_scale, which is useful when we multiply our tensors by model weights.
+
+We will also add tensor_transpose, because at the moment we calculate the model’s attention, we multiply two matrices that do not have ideal sizes, so we need to adjust the second one, for example: a×b * c×b needs to become a×b * b×c.
+
+We created nn_ops.c: our neural networks operations!
+
+These functions will be useful for assembling our layers, because we need the matrices to “multiply” with each other in order to generate new values and new matrices, which will be better explained in the next step.
+
+But in summary, we have that each input is a matrix, which will go through a phase of sequential transformations, being multiplied by values and other matrices, until in the end it becomes a completely different matrix. The thing is that this completely different matrix is the result of our LLM, and from it our sentence will come out.
+
+In nn_rmsnorm, which is an algorithm already well established in modern LLMs, we have Root Mean Square Normalization. We use this because matrices can generate very large or very small numbers, and this will ruin future calculations, since we want there to be a “standardized” calculation between layers, that is, without numbers that are too large or too small, only representative numbers. This technique is ideal for keeping the numbers within a standard.
+
+In nn_silu, we have a sigmoidal activation function. This function will sit between our layers to decide how neurons will activate. That is, imagine that each neuron is responsible for an “information” of our LLM; for example, we know that “Hello! How…” is followed by “are you?”, each neuron has information about what to do next, but the correct neurons (which learned greetings) will activate more strongly, so they will have a greater vote, and therefore a greater influence than the others.
+
+With this, we are close to building the neural network, for which we will add layers.c and layers.h.
