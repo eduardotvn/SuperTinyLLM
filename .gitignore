@@ -1,6 +1,3 @@
-src/model.c
-include/model.h
 *.o
 *.out
-*.exe
 *.bin

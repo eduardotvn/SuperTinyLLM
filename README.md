@@ -116,8 +116,19 @@ Em nn_rmsnorm, que é um algoritmo já "batido" em LLMs modernos, temos o Root M
 
 Em nn_silu temos uma função de ativação sigmoidal. Essa função ficará entre nossas camadas para decidir como os neurônios vão ativar. Isto é, imagine que cada neurônio é responsável por uma "informação" do nosso LLM, por exemplo, sabemos que "Olá! Tudo... " em seguida vem "bem?", cada neurônio tem uma informação do que fazer a seguir, mas os neurônios certos (que aprenderam saudação) vão ativar com mais força, então terão um voto maior, e por isso, uma influencia maior que os demais.
 
-Com isso, beiramos a construção da rede neural, que adicionaremos layers.c e layers.h
+# 26/01/2026
 
+Diversas alterações no código:
+
+Precisamos decidir qual o LLM que rodaremos no nosso sistema. Não vamos copiar o LLM em si, mas os pesos dele, a memória. Como nos baseamos no tokenizer do llama2, podemos usar um LLM de estrutura similar Llama. Há um pequeno LLM de 15 milhões de parâmetros treinado pelo Karpathy, onde os pesos estão dispostos em seu HuggingFace: https://huggingface.co/karpathy/tinyllamas/blob/0bd21da7698eaf29a0d7de3992de8a46ef624add/stories15M.pt
+
+Usaremos os pesos dele.
+
+Isso faz com que precisemos adicionar alguns cálculos e configurações naturais dos LLM llama, como RoPE (Rotary Positional Embedding). Esse cálculo, adicionado ao nn_ops, serve para indicar a "posição vetorial" de uma palavra. Imagine uqe, como no exemplo, "O rato roeu a roupa do rei de Roma", o "rato" é a segunda palavra, então em seu cálculo, o transformer sabe onde está a palavra, pois o cálculo é realizado em todas as palavras ao mesmo tempo, assim, o transformer consegue ter uma noção maior de semântica sabendo onde cada palavra está.
+
+Removemos alguns cálculos de tensor.c e movemos para nn_ops, pois antes serviam para demonstração. Além disso, removemos alguns que não serão usados, pois acabaram não sendo necessários para este LLM decoder-only.
+
+O model.c e o transformer.c estão prontos para geração de palavras, além do logits. Logo adicionarei a explicação do código aqui!
 
 # ENGLISH
 

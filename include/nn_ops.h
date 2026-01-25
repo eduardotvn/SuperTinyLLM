@@ -5,5 +5,7 @@
 
 void nn_rmsnorm(Tensor *out, Tensor *in, Tensor *weight, float eps);
 void nn_silu(Tensor *t);
+void nn_rope(float* q, float* k, int pos, int head_size, int dim); 
+void matmul(Tensor *out, Tensor *x, Tensor *w);
 
 #endif 

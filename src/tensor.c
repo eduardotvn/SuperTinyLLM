@@ -58,105 +58,40 @@ void tensor_print(Tensor *t) {
     printf("Size: %d", t->size);
 }
 
-float tensor_get_2d(Tensor *t, int i, int j) {
-    if (t->ndim != 2) {
-        printf("Error: tensor_get_2d called with a ndim=%d tensor \n", t->ndim);
-        exit(1);
-    }
-
-    int rows = t->shape[0];
-    int cols = t->shape[1];
-
-    if (i < 0 || i >= rows || j < 0 || j >= cols) {
-        printf("Error: index out of bounds (%d, %d)\n", i, j);
-        exit(1);
-    }
-
-    int index = i * cols + j;
-    return t->data[index];
-}
-
-void tensor_set_2d(Tensor *t, int i, int j, float value) {
-    if (t->ndim != 2) {
-        printf("Error: tensor_set_2d called with a ndim=%d tensor \n", t->ndim);
-        exit(1);
-    }
-
-    int rows = t->shape[0];
-    int cols = t->shape[1];
-
-    if (i < 0 || i >= rows || j < 0 || j >= cols) {
-        printf("Error: index out of bounds (%d, %d)\n", i, j);
-        exit(1);
-    }
-
-    int index = i * cols + j;
-    t->data[index] = value;
-}
-
-Tensor tensor_matmul_2d(Tensor *A, Tensor *B) {
-    if (A->ndim != 2 || B->ndim != 2) {
-        printf("Error: matmul needs 2D tensors\n");
-        exit(1);
-    }
-
-    int m = A->shape[0];
-    int kA = A->shape[1];
-    int kB = B->shape[0];
-    int n = B->shape[1];
-
-    if (kA != kB) {
-        printf("Error: incompatible dimensions (%d x %d) * (%d x %d)\n",
-               A->shape[0], A->shape[1], B->shape[0], B->shape[1]);
-        exit(1);
-    }
-
-    int shape[2] = {m, n};
-    Tensor C = tensor_create(2, shape);
-    tensor_fill(&C, 0.0f);
-
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            float sum = 0.0f;
-            for (int p = 0; p < kA; p++) {
-                float a = tensor_get_2d(A, i, p);
-                float b = tensor_get_2d(B, p, j);
-                sum += a * b;
-            }
-            tensor_set_2d(&C, i, j, sum);
-        }
-    }
-
-    return C;
-}
-
 void tensor_softmax_rows(Tensor *t) {
-    if (t->ndim != 2) {
-        printf("Error: softmax needs a 2D tensor \n");
+    int rows = 1;
+    int cols = t->shape[0];
+
+    if (t->ndim == 2) {
+        rows = t->shape[0];
+        cols = t->shape[1];
+    } else if (t->ndim != 1) {
+        fprintf(stderr, "Error: softmax expects 1D or 2D tensor\n");
         exit(1);
     }
 
-    int rows = t->shape[0];
-    int cols = t->shape[1];
+    float *data = t->data;
 
     for (int i = 0; i < rows; i++) {
+        float *row_ptr = data + (i * cols);
 
-        float max = tensor_get_2d(t, i, 0);
+        float max_val = row_ptr[0];
         for (int j = 1; j < cols; j++) {
-            float v = tensor_get_2d(t, i, j);
-            if (v > max) max = v;
+            if (row_ptr[j] > max_val) {
+                max_val = row_ptr[j];
+            }
         }
 
         float sum = 0.0f;
         for (int j = 0; j < cols; j++) {
-            float e = expf(tensor_get_2d(t, i, j) - max);
-            tensor_set_2d(t, i, j, e);
-            sum += e;
+            float val = expf(row_ptr[j] - max_val);
+            row_ptr[j] = val;
+            sum += val;
         }
 
+        float inv_sum = 1.0f / sum;
         for (int j = 0; j < cols; j++) {
-            float v = tensor_get_2d(t, i, j) / sum;
-            tensor_set_2d(t, i, j, v);
+            row_ptr[j] *= inv_sum;
         }
     }
 }
@@ -165,32 +100,4 @@ void tensor_add_inplace(Tensor *a, Tensor *b) {
     for (int i = 0; i < a->size; i++) {
         a->data[i] += b->data[i];
     }
-}
-
-void tensor_scale(Tensor *t, float factor) {
-    for (int i = 0; i < t->size; i++) {
-        t->data[i] *= factor;
-    }
-}
-
-Tensor tensor_transpose(Tensor *t) {
-    if (t->ndim != 2) {
-        fprintf(stderr, "Error: tensor_transpose needs a 2D tensor \n");
-        exit(1);
-    }
-
-    int rows = t->shape[0];
-    int cols = t->shape[1];
-
-    int new_shape[2] = {cols, rows};
-    Tensor out = tensor_create(2, new_shape);
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            float val = tensor_get_2d(t, i, j);
-            tensor_set_2d(&out, j, i, val); 
-        }
-    }
-
-    return out;
 }
